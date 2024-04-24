@@ -1,0 +1,30 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
+}
+
+body {
+    height: 100vh;
+}
+
+footer {
+    background-color: #FFD200;
+    position: absolute;
+    bottom: 1px;
+    width: 100%
+}
+
+.navbar-brand > img{
+    width: 50px;
+    color: gray
+}
+
+.card-group, .col {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
