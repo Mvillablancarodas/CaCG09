@@ -10,11 +10,11 @@
 
 ## Integrantes:
  Amato Juan Manuel 
- .....
+ Abregu Dana Agustina
  ....
  Paz Gustavo Rodolfo
  Villablanca Rodas Marcia Elizabeth
- -Abregu Dana Agustina
+
 
 
 ## Docente
