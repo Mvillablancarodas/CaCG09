@@ -12,8 +12,9 @@
  Amato Juan Manuel 
  .....
  ....
- ....
+ Paz Gustavo Rodolfo
  Villablanca Rodas Marcia Elizabeth
 
 
 ## Docente
+Fernandez Nicolas
