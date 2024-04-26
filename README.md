@@ -14,7 +14,7 @@
  ....
  Paz Gustavo Rodolfo
  Villablanca Rodas Marcia Elizabeth
- Abregu Dana Agustina
+ -Abregu Dana Agustina
 
 
 ## Docente
