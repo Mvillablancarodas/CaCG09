@@ -22,13 +22,16 @@ window.onload = async () => {
     try {
         endpoint = `/movie/popular?page=${page}`
         const data = await fetchData(endpoint)
-        const paginas = createElement('small','pages')
+        const paginas = createElement('small','pages', {
+            'data-aos': 'zoom-in',
+            'data-aos-duration': '1000',
+            'aos-init': '',
+            'aos-animate': '',
+        })
         paginas.innerHTML = `Pagina <b>${data.page}</b> de <b>${data.total_pages}</b>, mostrando ${data.results.length} elementos por pagina`
         cardContainer.insertAdjacentElement('beforebegin', paginas)
         data.results.forEach((movie) => {
             const pelicula = createElement('div', 'cardMovie');
-            const anchor = createElement('a', '');
-            anchor.href = './pages/detalle.html';
             const img = createElement('img', 'imgTendencia', {
                 src: `https://image.tmdb.org/t/p/w500/${movie.poster_path}`,
                 alt: movie.title,
@@ -38,6 +41,7 @@ window.onload = async () => {
             const titulo = createElement('h4', '');
             titulo.textContent = movie.title;
             tituloPelicula.appendChild(titulo)
+            pelicula.onclick = (e) => {handleDetail(movie.id)}
             pelicula.append(tituloPelicula,img)
 
             cardContainer.appendChild(pelicula)
@@ -76,9 +80,7 @@ form.onsubmit = async (e) => {
             const paginas = document.querySelector('small.pages')
             paginas.innerHTML = `Pagina <b>${data.page}</b> de <b>${data.total_pages}</b>, mostrando ${data.results.length} elementos por pagina`
             data.results.forEach((movie) => {
-                const pelicula = createElement('div', 'cardMovie');
-                const anchor = createElement('a', '');
-                anchor.href = './pages/detalle.html';
+                const pelicula = createElement('div', 'cardMovie',{onClick: handleDetail(movie)});
                 const img = createElement('img', 'imgTendencia', {
                     src: `https://image.tmdb.org/t/p/w500/${movie.poster_path}`,
                     alt: movie.title,
@@ -89,12 +91,62 @@ form.onsubmit = async (e) => {
                 titulo.textContent = movie.title;
                 tituloPelicula.appendChild(titulo)
                 pelicula.append(tituloPelicula,img)
-    
+                pelicula.onclick = (e) => {handleDetail(movie.id)}
                 cardContainer.appendChild(pelicula)
             });
         }
     } catch(err) {
         console.log(err.message)
         alert('error al hacer la peticion')
+    }
+}
+
+async function handleDetail (id) {
+    try {
+        const movie = await fetchData(`/movie/${+id}?language=en-US`)
+        console.log(movie)
+        const containerDetail = createElement('div','movieDetail-container')
+        const closeBtn = createElement('button','delete')
+        closeBtn.innerHTML= 'volver'
+        closeBtn.onclick = (e)=> {
+            e.preventDefault()
+            e.target.parentNode.parentNode.remove()
+        }
+        const imgBackDrop = createElement('img', 'imgBackdrop', {
+            src: `https://image.tmdb.org/t/p/w500/${movie.backdrop_path}`,
+            alt: movie.title,
+            loading: 'lazy'
+        });
+        const pelicula = createElement('div', 'movieDetail', {
+            'data-aos': 'zoom-in',
+            'data-aos-duration': '1000',
+            'aos-init': '',
+            'aos-animate': '',
+            style: `background-image: linear-gradient(to right top, rgba(109, 105, 105, 0.655), rgba(109, 105, 105, 0.655)), url(https://image.tmdb.org/t/p/w500/${movie.backdrop_path})`
+        });
+
+        const img = createElement('img', 'imgTendencia', {
+            src: `https://image.tmdb.org/t/p/w500/${movie.poster_path}`,
+            alt: movie.title,
+            loading: 'lazy'
+        });
+        const tituloPelicula = createElement('div', 'tituloPelicula');
+        const titulo = createElement('h4', '');
+        titulo.textContent = movie.title;
+        tituloPelicula.appendChild(titulo)
+        const infoContainer = createElement('div','movieInfo')
+        infoContainer.appendChild(img)
+        let movieInfo = `<div>
+        <p>${movie.overview}</p>
+        <p>${movie.release_date}<b>Genres</b>`
+        movie.genres.forEach(({name}) => movieInfo += `${name}, `)
+        movieInfo += `</p></div>`
+        infoContainer.innerHTML += movieInfo
+        pelicula.append(closeBtn,tituloPelicula,infoContainer)
+        containerDetail.appendChild(pelicula)
+        document.body.appendChild(containerDetail)
+
+    } catch (err) {
+        console.log(err)
     }
 }
