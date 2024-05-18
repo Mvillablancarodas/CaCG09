@@ -112,11 +112,6 @@ async function handleDetail (id) {
             e.preventDefault()
             e.target.parentNode.parentNode.remove()
         }
-        const imgBackDrop = createElement('img', 'imgBackdrop', {
-            src: `https://image.tmdb.org/t/p/w500/${movie.backdrop_path}`,
-            alt: movie.title,
-            loading: 'lazy'
-        });
         const pelicula = createElement('div', 'movieDetail', {
             'data-aos': 'zoom-in',
             'data-aos-duration': '1000',
