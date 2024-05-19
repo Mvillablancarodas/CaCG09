@@ -14,24 +14,75 @@ const createElement = (tag, className, attributes = {}) => {
     // Devolvemos el elemento creado
     return element;
 };
-let endpoint;
-let page = 1
+
 const cardContainer = document.querySelector('.contenedor-cartas')
+
+let url = new URL(window.location)
+let params = new URLSearchParams(url.search)
+params.set('page', 1)
+let page = params.get('page')
+params.set('endpoint', `/movie/popular?page=`)
+let endpoint = params.get('endpoint')
+let maxPage;
+
 
 window.onload = async () => {
     try {
-        endpoint = `/movie/popular?page=${page}`
+        handleCards(endpoint)
+        const pagination = document.querySelector('div#pagination')
+        const prevPage = createElement('button','pagination')
+        prevPage.innerHTML = 'anterior'
+        prevPage.onclick = () => {
+            if (+page <= 1) prevPage.disabled = true; 
+            else {
+                prevPage.disabled = false;
+                page = +page-1
+                params.set('page', page)
+                handleCards(endpoint+page)
+                console.log(params.get('page'))
+            }
+        }
+        const nextPage = createElement('button','pagination')
+        nextPage.innerHTML = 'Siguiente'
+        nextPage.onclick = () => {
+            if (+page == maxPage) nextPage.disabled = true; 
+            else {
+                nextPage.disabled = false;
+                page = +page+1
+                params.set('page', page)
+                handleCards(endpoint+page)
+                console.log(params.get('page'))
+            }
+        }
+        pagination.append(prevPage, nextPage)
+       
+    } catch (err) {
+        console.log(err)
+        alert('hubo un error en la peticion al API')
+    }
+}
+
+async function handleCards(endpoint) {
+    try {
         const data = await fetchData(endpoint)
-        const paginas = createElement('small','pages', {
-            'data-aos': 'zoom-in',
-            'data-aos-duration': '1000',
-            'aos-init': '',
-            'aos-animate': '',
-        })
-        paginas.innerHTML = `Pagina <b>${data.page}</b> de <b>${data.total_pages}</b>, mostrando ${data.results.length} elementos por pagina`
-        cardContainer.insertAdjacentElement('beforebegin', paginas)
+        const pagination = document.querySelector('div#pagination')
+        let paginasDetail;
+        maxPage = data.total_pages
+        if (document.querySelector('small#paginas')) {
+            paginasDetail = document.querySelector('small#paginas')
+            paginasDetail.innerHTML = `Pagina <b>${data.page}</b> de <b>${maxPage}</b>, mostrando ${data.results.length} elementos por pagina`
+        } else {
+            paginasDetail = `<small id="paginas">Pagina <b>${data.page}</b> de <b>${maxPage}</b>, mostrando ${data.results.length} elementos por pagina</small>`
+            pagination.insertAdjacentHTML('beforeend',paginasDetail)
+        }
+        cardContainer.replaceChildren()
         data.results.forEach((movie) => {
-            const pelicula = createElement('div', 'cardMovie');
+            const pelicula = createElement('div', 'cardMovie', {
+                'data-aos': 'zoom-in',
+                'data-aos-duration': '1000',
+                'aos-init': '',
+                'aos-animate': '',
+            });
             const img = createElement('img', 'imgTendencia', {
                 src: `https://image.tmdb.org/t/p/w500/${movie.poster_path}`,
                 alt: movie.title,
@@ -46,7 +97,7 @@ window.onload = async () => {
 
             cardContainer.appendChild(pelicula)
         });
-    } catch (err) {
+    } catch (error) {
         console.log(err)
         alert('hubo un error en la peticion al API')
     }
@@ -74,27 +125,9 @@ form.onsubmit = async (e) => {
     e.preventDefault()
     try {
         const query = form.search.value 
-        const data = await fetchData(`/search/movie?query=${query}&include_adult=false&language=en-US&page=${page}`)
-        if (data.results) {
-            cardContainer.replaceChildren()
-            const paginas = document.querySelector('small.pages')
-            paginas.innerHTML = `Pagina <b>${data.page}</b> de <b>${data.total_pages}</b>, mostrando ${data.results.length} elementos por pagina`
-            data.results.forEach((movie) => {
-                const pelicula = createElement('div', 'cardMovie',{onClick: handleDetail(movie)});
-                const img = createElement('img', 'imgTendencia', {
-                    src: `https://image.tmdb.org/t/p/w500/${movie.poster_path}`,
-                    alt: movie.title,
-                    loading: 'lazy'
-                });
-                const tituloPelicula = createElement('div', 'tituloPelicula');
-                const titulo = createElement('h4', '');
-                titulo.textContent = movie.title;
-                tituloPelicula.appendChild(titulo)
-                pelicula.append(tituloPelicula,img)
-                pelicula.onclick = (e) => {handleDetail(movie.id)}
-                cardContainer.appendChild(pelicula)
-            });
-        }
+        page = 1
+        endpoint = `/search/movie?query=${query}&include_adult=false&language=en-US&page=`
+        handleCards(endpoint+page)
     } catch(err) {
         console.log(err.message)
         alert('error al hacer la peticion')
@@ -104,7 +137,6 @@ form.onsubmit = async (e) => {
 async function handleDetail (id) {
     try {
         const movie = await fetchData(`/movie/${+id}?language=en-US`)
-        console.log(movie)
         const containerDetail = createElement('div','movieDetail-container')
         const closeBtn = createElement('button','delete')
         closeBtn.innerHTML= 'volver'
