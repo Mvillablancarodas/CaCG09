@@ -76,3 +76,19 @@ img.imgTendencia {
     color: white;
     padding: 5px;
 }
+
+.pagination {
+    gap: 10px;
+    padding: 5px;
+}
+button.pagination {
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    transition: 500ms;
+}
+
+button.pagination:hover {
+    color: white;
+    background-color: gray;
+}
