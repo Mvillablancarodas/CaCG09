@@ -5,3 +5,6 @@ td {
 table {
     border-collapse:collapse;
 }
+*   {
+    font-family: 'Nunito' !important;
+}

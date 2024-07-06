@@ -35,6 +35,27 @@ window.onload = () => {
         e.preventDefault()
         Array.from(Form).forEach(input => validateForm(input.name));
         if (Object.keys(errors).length > 0) alert('corregir los errores del formulario')
-        else alert('Sitio en construccion')
+        else {
+            const userData= {
+                username: Form.username.value,
+                contrasena: Form.password.value
+            }
+            fetch(http://localhost:8080/users, {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            }).then(res => {
+                if(res.status !== 200) {
+                    throw new error(res.message)
+                } else {
+                    res.json()
+                }
+            })
+            .then(data => {
+
+            })
+        }
     }
 };

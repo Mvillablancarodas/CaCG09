@@ -1,3 +1,7 @@
+*   {
+    font-family: 'Nunito' !important;
+}
+
 .contenedor-cartas {
     display: flex;
     flex-direction: row;

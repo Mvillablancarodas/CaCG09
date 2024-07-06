@@ -35,20 +35,20 @@ public class MovieService {
                 List<Genre> genres = new ArrayList<>();
                 while (rs_genres.next()){
                     Genre genre = new Genre(
-                            rs_genres.getInt("id"),
-                            rs_genres.getString("name"));
+                        rs_genres.getInt("id"),
+                        rs_genres.getString("name"));
                     genres.add(genre);
                 }
                 rs_genres.close();
                 ps_genres.close();
                 Movie movie = new Movie(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("image"),
-                        rs.getString("background_image"),
-                        rs.getString("overview"),
-                        rs.getString("release_date"),
-                        genres);
+                    rs.getInt("id"),
+                    rs.getString("title"),
+                    rs.getString("image"),
+                    rs.getString("background_image"),
+                    rs.getString("overview"),
+                    rs.getString("release_date"),
+                    genres);
                 movies.add(movie);
             }
             rs.close();
@@ -90,13 +90,13 @@ public class MovieService {
             ps_genres.close();
 
             movie = new Movie(
-                    rs.getInt("id"),
-                    rs.getString("title"),
-                    rs.getString("image"),
-                    rs.getString("background_image"),
-                    rs.getString("overview"),
-                    rs.getString("release_date"),
-                    genres);
+                rs.getInt("id"),
+                rs.getString("title"),
+                rs.getString("image"),
+                rs.getString("background_image"),
+                rs.getString("overview"),
+                rs.getString("release_date"),
+                genres);
         }
 
         rs.close();
