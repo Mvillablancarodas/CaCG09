@@ -11,7 +11,7 @@ public class Conexion {
         try {
             Class.forName(driver);
             String url = "jdbc:mysql://localhost:3306/cac_movies";
-            conexion = DriverManager.getConnection(url, "root", "Gustavo10*");
+            conexion = DriverManager.getConnection(url, "root", "");
         } catch (SQLException var3) {
             SQLException e = var3;
             System.out.println("Hay un error:" + String.valueOf(e));
