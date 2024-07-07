@@ -6,14 +6,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import com.cac.Movies.db.Conexion;
 import com.cac.Movies.entity.User;
+
 
 public class UserService {
     private final Conexion conexion;
     public UserService(){
         this.conexion = new Conexion();
     }
+
+    private static final String MESSAGE = "No se encuentra el usuario solcitado";
 
     public List<User> getAllUsers() throws SQLException, ClassNotFoundException
     {
@@ -38,23 +43,23 @@ public class UserService {
     }
     public User getUserById(int id) throws SQLException, ClassNotFoundException
     {
-        User user=null;
-        Connection con = conexion.getConnection();
-        String sql = "select * from users where id =?";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, id);
-        ResultSet rs=ps.executeQuery();
-        while (rs.next()){
-            user = new User(
-                rs.getInt("id"),
-                rs.getString("name"),
-                rs.getString("birth_date"),
-                rs.getString("username"),
-                "es secreto");
-        }
-        rs.close();
-        ps.close();
-        return user;
+            User user=null;
+            Connection con = conexion.getConnection();
+            String sql = "select * from users where id =?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs=ps.executeQuery();
+            while (rs.next()){
+                user = new User(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("birth_date"),
+                        rs.getString("username"),
+                        "es secreto");
+            }
+            rs.close();
+            ps.close();
+            return user;
     }
     public User addUser(User user) throws SQLException, ClassNotFoundException
     {
@@ -70,10 +75,10 @@ public class UserService {
         return user;
     }
 
-    public void deleteGenre(int id) throws SQLException, ClassNotFoundException
+    public void deleteUser(int id) throws SQLException, ClassNotFoundException
     {
         Connection con = conexion.getConnection();
-        String sql = "DELETE FROM genres WHERE id=?";
+        String sql = "DELETE FROM users WHERE id=?";
         PreparedStatement ps=con.prepareStatement(sql);
         ps.setInt(1,id);
         ps.executeUpdate();
@@ -92,5 +97,34 @@ public class UserService {
         ps.executeUpdate();
         ps.close();
         return user;
+    }
+    public User loginUser(String username, String contrasena) throws SQLException, ClassNotFoundException
+    {
+        try {
+            User user;
+            Connection con = conexion.getConnection();
+            String sql = "select * from users WHERE username=? and contrasena=?";
+            PreparedStatement ps=con.prepareStatement(sql);
+            ps.setString(1,username);
+            ps.setString(2,contrasena);
+            ResultSet rs=ps.executeQuery();
+            if (rs.next()) {
+                user = new User(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getString("birth_date"),
+                    rs.getString("username"),
+                    "es secreto");
+                rs.close();
+                ps.close();
+                System.out.println();
+                return user;
+            } else {
+                throw new ClassNotFoundException();
+            }
+        } catch (ClassNotFoundException e) {
+            System.out.println("Hay un error:" + String.valueOf(e));
+            throw new SQLException();
+        }
     }
 }

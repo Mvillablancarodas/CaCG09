@@ -10,11 +10,10 @@ public class Conexion {
         Connection conexion = null;
         try {
             Class.forName(driver);
-            String url = "jdbc:mysql://localhost:3306/cac_movies";
-            conexion = DriverManager.getConnection(url, "root", "");
+            String url = "jdbc:mysql://"+System.getenv("DB_HOST")+":3306/cac_movies";
+            conexion = DriverManager.getConnection(url, System.getenv("DB_USER"), System.getenv("DB_PASS"));
         } catch (SQLException var3) {
-            SQLException e = var3;
-            System.out.println("Hay un error:" + String.valueOf(e));
+            System.out.println("Hay un error:" + String.valueOf(var3));
         }
         return conexion;
     }

@@ -7,6 +7,8 @@ public class User {
     private String username;
     private String contrasena;
 
+    public User(){};
+
     public int getId() {
         return id;
     }
@@ -55,5 +57,4 @@ public class User {
         this.username=username;
         this.contrasena=contrasena;
     }
-
 }

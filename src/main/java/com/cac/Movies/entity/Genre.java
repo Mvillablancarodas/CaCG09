@@ -5,6 +5,8 @@ public class Genre {
     private int id;
     private String name;
 
+    public Genre(){};
+
     public String getName() {
         return name;
     }

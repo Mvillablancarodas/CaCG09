@@ -38,9 +38,9 @@ window.onload = () => {
         else {
             const userData= {
                 username: Form.username.value,
-                contrasena: Form.password.value
+                password: Form.password.value
             }
-            fetch(http://localhost:8080/users, {
+            fetch("http://localhost:8080/users/login", {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',
@@ -50,11 +50,12 @@ window.onload = () => {
                 if(res.status !== 200) {
                     throw new error(res.message)
                 } else {
-                    res.json()
+                    return res.json()
                 }
             })
             .then(data => {
-
+                sessionStorage.setItem('userData', JSON.stringify(data))
+                window.location = "/"
             })
         }
     }

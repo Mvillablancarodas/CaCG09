@@ -61,7 +61,7 @@ insert into genres(name) values
 
 insert into users(name,username,contrasena,birth_date) values (
 	'jhon doe',
-	'jhon',
+	'jhon@cac.com',
 	'jhon',
 	'1996-03-09'
 );
