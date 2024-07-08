@@ -1,5 +1,6 @@
 package com.cac.Movies.controller;
 
+import com.cac.Movies.dto.MoviesResponseDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
@@ -31,8 +32,12 @@ public class MoviesController extends HttpServlet {
         String pathInfo=req.getPathInfo();
         try {
             // si la url es la raiz ("/"), devuelve todas las peliculas
+            int page = 1;
+            if (req.getParameter("page") != null) {
+                page = Integer.parseInt(req.getParameter("page"));
+            }
             if(pathInfo==null || pathInfo.equals("/")) {
-                List<Movie> movies=movieService.getAllMovies();
+                MoviesResponseDTO movies=movieService.getAllMovies(page);
                 String json=objectMapper.writeValueAsString(movies);
                 resp.setContentType("application/json");
                 resp.getWriter().write(json);
@@ -66,11 +71,13 @@ public class MoviesController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             Movie pelicula = objectMapper.readValue(req.getReader(),Movie.class);
-            movieService.addMovie(pelicula);
+            Movie created_movie = movieService.addMovie(pelicula);
+            String json=objectMapper.writeValueAsString(created_movie);
+            resp.setContentType("application/json");
+            resp.getWriter().write(json);
             resp.setStatus(HttpServletResponse.SC_CREATED);
         } catch(SQLException|ClassNotFoundException e) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-
         }
     }
 }

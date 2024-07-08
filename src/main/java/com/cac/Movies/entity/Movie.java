@@ -10,6 +10,7 @@ public class Movie {
     private String background_image;
     private String overview;
     private List<Genre> genres;
+    private String release_date;
 
     public Movie(){};
 
@@ -20,9 +21,6 @@ public class Movie {
     public void setGenres(List<Genre> genres) {
         this.genres = genres;
     }
-
-    private String release_date;
-
 
     public int getId() {
         return id;

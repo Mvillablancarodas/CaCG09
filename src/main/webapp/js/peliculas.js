@@ -25,46 +25,63 @@ params.set('endpoint', `/movie/popular?page=`)
 let endpoint = params.get('endpoint')
 let maxPage;
 
+const prevPage = document.querySelector('button[id="previous"]')
+prevPage.onclick = () => {
+    if (+page <= 1) prevPage.disabled = true;
+    else {
+        prevPage.disabled = false;
+        page = +page-1
+        params.set('page', page)
+        handleCards(endpoint+page)
+        console.log(params.get('page'))
+    }
+}
+const nextPage = document.querySelector('button[id="next"]')
+nextPage.onclick = () => {
+    if (+page == maxPage) nextPage.disabled = true;
+    else {
+        nextPage.disabled = false;
+        page = +page+1
+        params.set('page', page)
+        handleCards(endpoint+page)
+        console.log(params.get('page'))
+    }
+}
+
+let API_origen;
 
 window.onload = async () => {
     try {
-        handleCards(endpoint)
-        const pagination = document.querySelector('div#pagination')
-        const prevPage = createElement('button','pagination')
-        prevPage.innerHTML = 'anterior'
-        prevPage.onclick = () => {
-            if (+page <= 1) prevPage.disabled = true; 
-            else {
-                prevPage.disabled = false;
-                page = +page-1
-                params.set('page', page)
+        const origen = document.querySelectorAll('input[type="radio"][name="origen"]')
+        Array.from(origen).forEach(origen => {
+            if (origen.checked) API_origen = origen.value
+            if (origen.value == "local") endpoint = '/movies?page='
+            origen.onchange = () => {
+                if (origen.checked && origen.value == "local") {
+                    API_origen = origen.value
+                    endpoint = '/movies?page='
+                } else if (origen.checked && origen.value == "terceros") {
+                    API_origen = origen.value
+                    endpoint = '/movie/popular?page='
+                }
+                const paginationButtons = document.querySelectorAll("button.pagination")
+                Array.from(paginationButtons).forEach((button)=> {
+                    button.disabled = false
+                    page = 1
+                })
                 handleCards(endpoint+page)
-                console.log(params.get('page'))
             }
-        }
-        const nextPage = createElement('button','pagination')
-        nextPage.innerHTML = 'Siguiente'
-        nextPage.onclick = () => {
-            if (+page == maxPage) nextPage.disabled = true; 
-            else {
-                nextPage.disabled = false;
-                page = +page+1
-                params.set('page', page)
-                handleCards(endpoint+page)
-                console.log(params.get('page'))
-            }
-        }
-        pagination.append(prevPage, nextPage)
-       
+        })
+        handleCards(endpoint+page)
     } catch (err) {
         console.log(err)
         alert('hubo un error en la peticion al API')
     }
 }
 
-async function handleCards(endpoint) {
+async function handleCards() {
     try {
-        const data = await fetchData(endpoint)
+        const data = await fetchData(endpoint+page)
         const pagination = document.querySelector('div#pagination')
         let paginasDetail;
         maxPage = data.total_pages
@@ -75,6 +92,7 @@ async function handleCards(endpoint) {
             paginasDetail = `<small id="paginas">Pagina <b>${data.page}</b> de <b>${maxPage}</b>, mostrando ${data.results.length} elementos por pagina</small>`
             pagination.insertAdjacentHTML('beforeend',paginasDetail)
         }
+
         cardContainer.replaceChildren()
         data.results.forEach((movie) => {
             const pelicula = createElement('div', 'cardMovie', {
@@ -84,7 +102,7 @@ async function handleCards(endpoint) {
                 'aos-animate': '',
             });
             const img = createElement('img', 'imgTendencia', {
-                src: `https://image.tmdb.org/t/p/w500/${movie.poster_path}`,
+                src: API_origen == "local"? movie.image : `https://image.tmdb.org/t/p/w500/${movie.poster_path}`,
                 alt: movie.title,
                 loading: 'lazy'
             });
@@ -98,18 +116,20 @@ async function handleCards(endpoint) {
             cardContainer.appendChild(pelicula)
         });
     } catch (error) {
-        console.log(err)
+        console.log(error)
         alert('hubo un error en la peticion al API')
     }
 }
 
 async function fetchData(endpoint) {
+    if (API_origen == "local") url=`http://${window.location.host}`
+    else url = "https://api.themoviedb.org/3"
     try {
-        const res = await fetch(`https://api.themoviedb.org/3${endpoint}`, {
+        const res = await fetch(`${url}${endpoint}`, {
             method: 'GET',
             headers: {
                 accept: 'application/json',
-                Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhYTJjYTAwZDYxZWIzOTEyYjZlNzc4MDA4YWQ3ZmNjOCIsInN1YiI6IjYyODJmNmYwMTQ5NTY1MDA2NmI1NjlhYyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.4MJSPDJhhpbHHJyNYBtH_uCZh4o0e3xGhZpcBIDy-Y8'
+                Authorization: API_origen == "local"? "" : 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhYTJjYTAwZDYxZWIzOTEyYjZlNzc4MDA4YWQ3ZmNjOCIsInN1YiI6IjYyODJmNmYwMTQ5NTY1MDA2NmI1NjlhYyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.4MJSPDJhhpbHHJyNYBtH_uCZh4o0e3xGhZpcBIDy-Y8'
             }
         })
         const data = await res.json()
@@ -126,7 +146,7 @@ form.onsubmit = async (e) => {
     try {
         const query = form.search.value 
         page = 1
-        endpoint = `/search/movie?query=${query}&include_adult=false&language=en-US&page=`
+        endpoint = API_origen == "local"? `/movies?search=${query}&page=` : `/search/movie?query=${query}&include_adult=false&language=en-US&page=`
         handleCards(endpoint+page)
     } catch(err) {
         console.log(err.message)
@@ -136,7 +156,7 @@ form.onsubmit = async (e) => {
 
 async function handleDetail (id) {
     try {
-        const movie = await fetchData(`/movie/${+id}?language=en-US`)
+        const movie = await fetchData(API_origen=="local"? `/movies/${+id}` : `/movie/${+id}?language=en-US`)
         const containerDetail = createElement('div','movieDetail-container')
         const closeBtn = createElement('button','delete')
         closeBtn.innerHTML= 'volver'
@@ -149,11 +169,11 @@ async function handleDetail (id) {
             'data-aos-duration': '1000',
             'aos-init': '',
             'aos-animate': '',
-            style: `background-image: linear-gradient(to right top, rgba(109, 105, 105, 0.655), rgba(109, 105, 105, 0.655)), url(https://image.tmdb.org/t/p/w500/${movie.backdrop_path})`
+            style: `background-image: linear-gradient(to right top, rgba(109, 105, 105, 0.655), rgba(109, 105, 105, 0.655)), url(${API_origen=="local"? movie.background_image : `https://image.tmdb.org/t/p/w500/${movie.backdrop_path}`})`
         });
 
         const img = createElement('img', 'imgTendencia', {
-            src: `https://image.tmdb.org/t/p/w500/${movie.poster_path}`,
+            src: API_origen=="local"? movie.image : `https://image.tmdb.org/t/p/w500/${movie.poster_path}`,
             alt: movie.title,
             loading: 'lazy'
         });

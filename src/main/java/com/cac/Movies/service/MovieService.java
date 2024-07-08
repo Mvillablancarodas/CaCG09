@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import com.cac.Movies.db.Conexion;
+import com.cac.Movies.dto.MoviesResponseDTO;
 import com.cac.Movies.entity.Genre;
 import com.cac.Movies.entity.Movie;
 
@@ -15,13 +16,14 @@ public class MovieService {
     public MovieService(){
         this.conexion = new Conexion();
     }
-    public List<Movie> getAllMovies() throws SQLException, ClassNotFoundException
+    public MoviesResponseDTO getAllMovies(int page) throws SQLException, ClassNotFoundException
     {
         try {
             List<Movie> movies = new ArrayList<>();
             Connection con = conexion.getConnection();
-            String sql = "select * from movies";
+            String sql = "select * from movies limit 10 offset ?";
             PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1,(page-1)*10);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -53,11 +55,21 @@ public class MovieService {
             }
             rs.close();
             ps.close();
-
-            return movies;
+            String sql_count = "select count(id) as movies_count from movies";
+            PreparedStatement ps_count = con.prepareStatement(sql_count);
+            ResultSet rs_count = ps_count.executeQuery();
+            if (rs_count.next()) {
+                MoviesResponseDTO response = new MoviesResponseDTO(
+                        page,
+                        movies,
+                        (int) Math.ceil((double) rs_count.getInt("movies_count") /10),
+                        rs_count.getInt("movies_count"));
+                ps_count.close();
+                rs_count.close();
+                return response;
+            } else {throw new SQLException();}
         } catch(SQLException f){
-            SQLException var2 = f;
-            System.out.println(String.valueOf(var2));
+            System.out.println(String.valueOf(f));
             return null;
         }
 
@@ -106,18 +118,50 @@ public class MovieService {
 
     public Movie addMovie(Movie movie) throws SQLException, ClassNotFoundException
     {
-        Connection con = conexion.getConnection();
-        String sql = "INSERT INTO movies (title,image,background_image,overview,release_date) " +
-                "VALUES (?,?,?,?,?)";
-        PreparedStatement ps=con.prepareStatement(sql);
-        ps.setString(1,movie.getTitle());
-        ps.setString(2,movie.getImage());
-        ps.setString(3,movie.getBackground_image());
-        ps.setString(4,movie.getOverview());
-        ps.setString(5,movie.getRelease_date());
-        ps.executeUpdate();
-        ps.close();
-        return movie;
+        try {
+            Connection con = conexion.getConnection();
+            String sql = "INSERT INTO movies (title,image,background_image,overview,release_date) " +
+                    "VALUES (?,?,?,?,?)";
+            PreparedStatement ps=con.prepareStatement(sql);
+            ps.setString(1,movie.getTitle());
+            ps.setString(2,movie.getImage());
+            ps.setString(3,movie.getBackground_image());
+            ps.setString(4,movie.getOverview());
+            ps.setString(5,movie.getRelease_date());
+            ps.executeUpdate();
+            ps.close();
+            String sql_created = "select * from movies where title=? and image=? and background_image=? and overview=? and release_date=?";
+            PreparedStatement ps_created = con.prepareStatement(sql_created);
+            ps_created.setString(1,movie.getTitle());
+            ps_created.setString(2,movie.getImage());
+            ps_created.setString(3,movie.getBackground_image());
+            ps_created.setString(4,movie.getOverview());
+            ps_created.setString(5,movie.getRelease_date());
+            ResultSet rs = ps_created.executeQuery();
+            if (rs.next()) {
+                movie.setId(rs.getInt("id"));
+                List<Genre> genres= movie.getGenres();
+                for(int i=0;i < genres.toArray().length;i++){
+                    Genre genre = (Genre) genres.toArray()[i];
+                    String sql_genre = "insert into movie_genres (movie_id, genre_id) values (?,?)";
+                    PreparedStatement ps_genre = con.prepareStatement(sql_genre);
+                    ps_genre.setInt(1,movie.getId());
+                    ps_genre.setInt(2,genre.getId());
+                    ps_genre.executeUpdate();
+                    ps_genre.close();
+                }
+                rs.close();
+                ps_created.close();
+                return movie;
+            }
+            else {
+                throw new SQLException();
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            System.out.println(String.valueOf(e));
+            throw new SQLException();
+        }
+
     }
 
     public void deleteMovie(int id) throws SQLException, ClassNotFoundException

@@ -96,3 +96,27 @@ button.pagination:hover {
     color: white;
     background-color: gray;
 }
+
+.userData {
+    background: white;
+    border: solid 1px transparent;
+    border-radius: 5px;
+    padding: 5px;
+    gap: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 1px 1px 1px 1px gray;
+ }
+
+ .userData>img {
+    text-align: center;
+    width: 30px;
+    height: 30px;
+    border: solid 1px transparent;
+    background-color: #FFD200;
+    color: white;
+    font-weigh: bolder;
+    border-radius: 50%;
+ }
