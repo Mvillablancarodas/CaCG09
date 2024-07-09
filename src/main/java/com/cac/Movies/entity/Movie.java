@@ -9,16 +9,17 @@ public class Movie {
     private String image;
     private String background_image;
     private String overview;
-    private List<Genre> genres;
+    private Object genres;
     private String release_date;
+
 
     public Movie(){};
 
-    public List<Genre> getGenres() {
+    public Object getGenres() {
         return genres;
     }
 
-    public void setGenres(List<Genre> genres) {
+    public void setGenres(Object genres) {
         this.genres = genres;
     }
 

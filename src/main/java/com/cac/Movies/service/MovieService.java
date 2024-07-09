@@ -140,19 +140,19 @@ public class MovieService {
             ResultSet rs = ps_created.executeQuery();
             if (rs.next()) {
                 movie.setId(rs.getInt("id"));
-                List<Genre> genres= movie.getGenres();
-                for(int i=0;i < genres.toArray().length;i++){
-                    Genre genre = (Genre) genres.toArray()[i];
+                List<Integer> genres_id = (List<Integer>) movie.getGenres();
+                for(int i=0;i < genres_id.toArray().length;i++){
+                    int genre_id = (int) genres_id.toArray()[i];
                     String sql_genre = "insert into movie_genres (movie_id, genre_id) values (?,?)";
                     PreparedStatement ps_genre = con.prepareStatement(sql_genre);
                     ps_genre.setInt(1,movie.getId());
-                    ps_genre.setInt(2,genre.getId());
+                    ps_genre.setInt(2,genre_id);
                     ps_genre.executeUpdate();
                     ps_genre.close();
                 }
                 rs.close();
                 ps_created.close();
-                return movie;
+                return getMoviesById(movie.getId());
             }
             else {
                 throw new SQLException();

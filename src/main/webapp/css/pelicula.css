@@ -120,3 +120,12 @@ button.pagination:hover {
     font-weigh: bolder;
     border-radius: 50%;
  }
+
+ .forms {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    padding: 5px;
+    gap: 10px;
+ }
