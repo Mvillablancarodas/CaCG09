@@ -130,13 +130,8 @@ public class MovieService {
             ps.setString(5,movie.getRelease_date());
             ps.executeUpdate();
             ps.close();
-            String sql_created = "select * from movies where title=? and image=? and background_image=? and overview=? and release_date=?";
+            String sql_created = "SELECT LAST_INSERT_ID() AS id";
             PreparedStatement ps_created = con.prepareStatement(sql_created);
-            ps_created.setString(1,movie.getTitle());
-            ps_created.setString(2,movie.getImage());
-            ps_created.setString(3,movie.getBackground_image());
-            ps_created.setString(4,movie.getOverview());
-            ps_created.setString(5,movie.getRelease_date());
             ResultSet rs = ps_created.executeQuery();
             if (rs.next()) {
                 movie.setId(rs.getInt("id"));
