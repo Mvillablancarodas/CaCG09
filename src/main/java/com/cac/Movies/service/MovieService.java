@@ -16,14 +16,15 @@ public class MovieService {
     public MovieService(){
         this.conexion = new Conexion();
     }
-    public MoviesResponseDTO getAllMovies(int page) throws SQLException, ClassNotFoundException
+    public MoviesResponseDTO getAllMovies(String search,int page) throws SQLException, ClassNotFoundException
     {
         try {
             List<Movie> movies = new ArrayList<>();
             Connection con = conexion.getConnection();
-            String sql = "select * from movies limit 10 offset ?";
+            String sql = "select * from movies where title like ? limit 10 offset ?";
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setInt(1,(page-1)*10);
+            ps.setString(1,'%'+search+'%');
+            ps.setInt(2,(page-1)*10);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {

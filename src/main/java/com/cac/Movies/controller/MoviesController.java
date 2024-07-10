@@ -32,12 +32,12 @@ public class MoviesController extends HttpServlet {
         String pathInfo=req.getPathInfo();
         try {
             // si la url es la raiz ("/"), devuelve todas las peliculas
-            int page = 1;
-            if (req.getParameter("page") != null) {
-                page = Integer.parseInt(req.getParameter("page"));
-            }
+            int page=1;
+            String search="";
+            if (req.getParameter("page") != null) page = Integer.parseInt(req.getParameter("page"));
+            if (req.getParameter("search") != null) search = req.getParameter("search");
             if(pathInfo==null || pathInfo.equals("/")) {
-                MoviesResponseDTO movies=movieService.getAllMovies(page);
+                MoviesResponseDTO movies=movieService.getAllMovies(search,page);
                 String json=objectMapper.writeValueAsString(movies);
                 resp.setContentType("application/json");
                 resp.getWriter().write(json);
