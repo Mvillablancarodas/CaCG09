@@ -26,7 +26,6 @@ public class MovieService {
             ps.setString(1,'%'+search+'%');
             ps.setInt(2,(page-1)*10);
             ResultSet rs = ps.executeQuery();
-
             while (rs.next()) {
                 String sql_genres="select g.id,g.name from genres g " +
                     "inner join movie_genres mg on mg.genre_id = g.id "+
@@ -56,15 +55,16 @@ public class MovieService {
             }
             rs.close();
             ps.close();
-            String sql_count = "select count(id) as movies_count from movies";
+            String sql_count = "select count(id) as movies_count from movies where title like ?";
             PreparedStatement ps_count = con.prepareStatement(sql_count);
+            ps_count.setString(1,'%'+search+'%');
             ResultSet rs_count = ps_count.executeQuery();
             if (rs_count.next()) {
                 MoviesResponseDTO response = new MoviesResponseDTO(
-                        page,
-                        movies,
-                        (int) Math.ceil((double) rs_count.getInt("movies_count") /10),
-                        rs_count.getInt("movies_count"));
+                    page,
+                    movies,
+                    (int) Math.ceil((double) rs_count.getInt("movies_count") /10),
+                    rs_count.getInt("movies_count"));
                 ps_count.close();
                 rs_count.close();
                 return response;
@@ -84,7 +84,7 @@ public class MovieService {
         PreparedStatement ps = con.prepareStatement(sql);
         ps.setInt(1, id);
         ResultSet rs=ps.executeQuery();
-        while(rs.next()) {
+        if(rs.next()) {
             String sql_genres="select g.id,g.name from genres g " +
                 "inner join movie_genres mg on mg.genre_id = g.id "+
                 "inner join movies m on m.id = mg.movie_id "+
